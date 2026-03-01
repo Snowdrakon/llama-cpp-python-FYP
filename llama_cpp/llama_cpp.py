@@ -851,7 +851,7 @@ class llama_context_params(ctypes.Structure):
         yarn_beta_slow: float
         yarn_orig_ctx: int
         defrag_thold: float
-        cb_eval: Callable[[ctypes.c_void_p, bool], bool]
+        cb_eval: Callable[[ctypes.c_void_p, bool, ctypes.c_void_p], bool]
         cb_eval_user_data: ctypes.c_void_p
         type_k: int
         type_v: int

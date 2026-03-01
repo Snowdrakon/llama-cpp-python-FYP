@@ -51,8 +51,6 @@ import llama_cpp._internals as internals
 from ._logger import set_verbose
 from ._utils import suppress_stdout_stderr
 
-GgmlBackendSchedEvalCallback = llama_cpp.ggml_backend_sched_eval_callback
-
 class Llama:
     """High-level Python wrapper for a llama.cpp model."""
 
@@ -115,7 +113,8 @@ class Llama:
         type_k: Optional[int] = None,
         type_v: Optional[int] = None,
         # Callback for tensor evaluation
-        cb_eval: Optional[Callable[[GgmlBackendSchedEvalCallback], bool]] = None,
+        # signature: cb_eval(tensor: ggml_tensor*, ask: bool, user_data: void*) -> bool
+        cb_eval: Optional[Callable[[ctypes.c_void_p, bool, ctypes.c_void_p], bool]] = None,
         # Misc
         spm_infill: bool = False,
         verbose: bool = True,
