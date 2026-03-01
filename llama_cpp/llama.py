@@ -51,6 +51,7 @@ import llama_cpp._internals as internals
 from ._logger import set_verbose
 from ._utils import suppress_stdout_stderr
 
+GgmlBackendSchedEvalCallback = llama_cpp.ggml_backend_sched_eval_callback
 
 class Llama:
     """High-level Python wrapper for a llama.cpp model."""
@@ -113,6 +114,8 @@ class Llama:
         # KV cache quantization
         type_k: Optional[int] = None,
         type_v: Optional[int] = None,
+        # Callback for tensor evaluation
+        cb_eval: Optional[Callable[[GgmlBackendSchedEvalCallback], bool]] = None,
         # Misc
         spm_infill: bool = False,
         verbose: bool = True,
@@ -188,6 +191,7 @@ class Llama:
             verbose: Print verbose output to stderr.
             type_k: KV cache data type for K (default: f16)
             type_v: KV cache data type for V (default: f16)
+            cb_eval: Optional callback function invoked during GGML tensor evaluation. Useful for extracting intermediate hidden activations. Callback signature: cb_eval(tensor: ggml_tensor*, ask: bool, user_data: void*) -> bool. Return False to abort evaluation.
             spm_infill: Use Suffix/Prefix/Middle pattern for infill (instead of Prefix/Suffix/Middle) as some models prefer this.
 
         Raises:
@@ -354,6 +358,9 @@ class Llama:
             self.context_params.type_k = type_k
         if type_v is not None:
             self.context_params.type_v = type_v
+        # Tensor evaluation callback
+        if cb_eval is not None:
+            self.context_params.cb_eval = cb_eval
         # Sampling Params
         self.context_params.no_perf = no_perf
         self.last_n_tokens_size = last_n_tokens_size
@@ -364,6 +371,7 @@ class Llama:
         self.lora_scale = lora_scale
         self.lora_path = lora_path
 
+        self._cb_eval = cb_eval
         self.spm_infill = spm_infill
 
         if not os.path.exists(model_path):
