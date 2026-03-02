@@ -117,6 +117,28 @@ ggml_backend_sched_eval_callback = ctypes.CFUNCTYPE(
 # typedef bool (*ggml_abort_callback)(void * data);
 ggml_abort_callback = ctypes.CFUNCTYPE(ctypes.c_bool, ctypes.c_void_p)
 
+
+# GGML helper functions exposed from ggml (useful for eval-callbacks)
+# GGML_API const char * ggml_get_name(const struct ggml_tensor * tensor);
+@ctypes_function("ggml_get_name", [ctypes.c_void_p], ctypes.c_char_p)
+def ggml_get_name(tensor) -> bytes:
+    """Return the name (bytes) of a ggml tensor pointer."""
+    ...
+
+
+# GGML_API size_t ggml_nbytes(const struct ggml_tensor * tensor);
+@ctypes_function("ggml_nbytes", [ctypes.c_void_p], ctypes.c_size_t)
+def ggml_nbytes(tensor) -> int:
+    """Return the number of bytes used by a ggml tensor."""
+    ...
+
+
+# GGML_API void ggml_backend_tensor_get(const struct ggml_tensor * tensor, void * dst, size_t off, size_t nbytes);
+@ctypes_function("ggml_backend_tensor_get", [ctypes.c_void_p, ctypes.c_void_p, ctypes.c_size_t, ctypes.c_size_t], None)
+def ggml_backend_tensor_get(tensor, dst, off: int, nbytes: int):
+    """Copy `nbytes` bytes from `tensor` into `dst` starting at offset `off`."""
+    ...
+
 # llama.h bindings
 
 _lib.llama_max_devices.argtypes = []
